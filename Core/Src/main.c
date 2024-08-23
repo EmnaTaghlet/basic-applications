@@ -85,8 +85,6 @@ int main(void)
 	 int32_t CH1_DC = 0;
   /* USER CODE END 1 */
 
-
-
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -115,8 +113,6 @@ int main(void)
   MX_USB_HOST_Init();
   MX_TIM2_Init();
   MX_TIM4_Init();
-  HAL_TIM_Base_Start_IT(&htim2);
-  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -144,9 +140,7 @@ int main(void)
   }
   /* USER CODE END 3 */
 }
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-}
+
 /**
   * @brief System Clock Configuration
   * @retval None
