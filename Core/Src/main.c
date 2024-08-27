@@ -53,7 +53,22 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if(GPIO_Pin == GPIO_PIN_0)
+    {
+    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13); // Toggle The Output (LED) Pin
+    }
+}
+void HAL_GPIO_EXTI0_IRQHandler(uint16_t GPIO_Pin)
+{
 
+  if (__HAL_GPIO_EXTI_GET_IT(GPIO_Pin) != 0x00u)
+  {
+    __HAL_GPIO_EXTI_CLEAR_IT(GPIO_Pin);
+     HAL_GPIO_EXTI_Callback(GPIO_Pin);
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -98,13 +113,7 @@ int main(void)
   }
   /* USER CODE END 3 */
 }
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-    if(GPIO_Pin == GPIO_PIN_0) // If The INT Source Is EXTI Line9 (A9 Pin)
-    {
-    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-    }
-}
+
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -204,10 +213,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-void EXTI_IRQHandler(void)   // <----- The ISR Function We're Looking For!
-{
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
-}
+
 #ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
