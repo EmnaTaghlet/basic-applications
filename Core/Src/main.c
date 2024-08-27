@@ -54,7 +54,7 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
-
+int AD_RES;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -122,28 +122,14 @@ int main(void)
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
-  HAL_ADC_Start_DMA(&hadc1,&AD_RES,2);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //pollforconversion
-	 HAL_ADC_Start(&hadc1);
-	  HAL_ADC_PollForConversion(&hadc1, 1);
-	  AD_RES = HAL_ADC_GetValue(&hadc1);
-	  TIM4->CCR2 = (AD_RES<<4);
-	  HAL_Delay(1);
-	  //interrupt
-	  /*HAL_ADC_Start_IT(&hadc1);
-      TIM4->CCR1 = (AD_RES<<4);
-	  HAL_Delay(1);*/
-	  //DMA
-	/* HAL_ADC_Start_DMA(&hadc1, &AD_RES, 1);
-	  HAL_Delay(1);*/
-     //continuous conv polling
-	  //HAL_ADC_Start_DMA(&hadc1,&AD_RES,2);
+	  HAL_ADC_Start_DMA(&hadc1,&AD_RES,1);
 
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
@@ -248,7 +234,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.DMAContinuousRequests = ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
@@ -608,7 +594,13 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+    // Conversion Complete & DMA Transfer Complete As Well
+    // So The AD_RES Is Now Updated & Let's Move IT To The PWM CCR1
+    // Update The PWM Duty Cycle With Latest ADC Conversion Result
+    TIM4->CCR2 = (AD_RES<<4);
+}
 /* USER CODE END 4 */
 
 /**
